@@ -1,6 +1,7 @@
 # Wokwi Library List
 # See https://docs.wokwi.com/guides/libraries
 
-ArduinoJson
-HttpClient
-WiFi
+#ArduinoJson
+#HttpClient
+PubSubClient
+DHT sensor library
