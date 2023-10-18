@@ -1,6 +1,6 @@
 # Embedded Temperature Monitoring System
 
-![Project Screenshot](https://github.com/NexusNova-IOT/embedded-system-temperature/blob/main/assets/screenshot.png)
+<h1 align="center"> <img src="https://raw.githubusercontent.com/NexusNova-IOT/embedded-system-temperature/main/assets/screenshot.png" alt="Project Screenshot" height="350"> </h1>
 
 ## Project Description
 
