@@ -1,78 +1,40 @@
-#include <WiFi.h>
-#include <DHT.h>
-#include <PubSubClient.h>
-#define DELAY 1000
-// MQTT Server Parameters
-const char* MQTT_CLIENT_ID = "esp32-weather-demo";
-const char* MQTT_BROKER = "broker.mqttdashboard.com";
-const char* MQTT_USER = "";
-const char* MQTT_PASSWORD = "";
-const char* MQTT_TOPIC = "wokwi-weather";
-
+#include <Arduino.h>
+#include "wifi_utils.h"
+#include "weather_sensor.h"
+#include "http_utils.h"
+#define DELAY 3000
 const char* ssid = "Wokwi-GUEST";
 const char* password = "";
-
-const int DHT_PIN = 15;
-
-DHT dht(DHT_PIN, DHT22);
-WiFiClient espClient;
-PubSubClient client(espClient);
+const char* serverAddress = "https://lifetravel-iot-backend.azurewebsites.net/api/v1/weather-sensors/update-weather/1";
+const char* authToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImQ0OWU0N2ZiZGQ0ZWUyNDE0Nzk2ZDhlMDhjZWY2YjU1ZDA3MDRlNGQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbGlmZXRyYXZlbC1hcHAiLCJhdWQiOiJsaWZldHJhdmVsLWFwcCIsImF1dGhfdGltZSI6MTY5OTA3NTcxNCwidXNlcl9pZCI6IjJpRmNqeTJVaHhOdkJET1pNclFkMlZEb0lzeTIiLCJzdWIiOiIyaUZjankyVWh4TnZCRE9aTXJRZDJWRG9Jc3kyIiwiaWF0IjoxNjk5MDc1NzE0LCJleHAiOjE2OTkwNzkzMTQsImVtYWlsIjoiaW90QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJpb3RAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoicGFzc3dvcmQifX0.YR4dhjzf-JB96J-B1dLyq_YfxmALc4ufZIKQmg9-foUo7mPRnsA2DfZ4i7hlIWpBDRBtaqBJYRxRFvX8aCT5abxwKTc1rnEAjyMbSnOvQuJzzy34y6neNNHLK1wWt3nMTUti4kWWV2Gsw0Mcg5o1t3X2SQ9ZXD92w5ch0tYqqZxskFl-rPESL9rNX4Y1BS4D3V6_ma0IdtkcUW8J5bTOvQJw1wSAKrvOHQwI4j4yIQZq_uhXKhPdbdNYIG3wpYEvXLO9oX2R5yDuhx9CFOo6zpmiyUWbzuf_4ug1PgzL5d3tSVFa5CEdG2qzVTaMvJcUVsFOMymPMuqkNBPQ2ffGGQ";
+// please update the token here
+// https://iot-lifetravel-firebase-token-gen.netlify.app/login
+// email: iot@gmail.com
+// password: 12345678
 
 void setup() {
   Serial.begin(115200);
-
-  // Connect to Wi-Fi
-  Serial.print("Connecting to WiFi");
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("Connected!");
-
-  // Set up MQTT client
-  client.setServer(MQTT_BROKER, 1883);
-
-  // Initialize DHT sensor
-  dht.begin();
-}
-
-void reconnect() {
-  // Loop until we're reconnected to the MQTT broker
-  while (!client.connected()) {
-    Serial.print("Connecting to MQTT server... ");
-    if (client.connect(MQTT_CLIENT_ID, MQTT_USER, MQTT_PASSWORD)) {
-      Serial.println("Connected!");
-    } else {
-      Serial.print("Failed, rc=");
-      Serial.print(client.state());
-      Serial.println(" Retrying in 5 seconds...");
-      delay(5000);
-    }
-  }
+  setupWiFi(ssid, password);
+  setupWeatherSensor();
 }
 
 void loop() {
-  if (!client.connected()) {
-    reconnect();
-  }
-  client.loop();
-
-  // Measuring weather conditions
-  Serial.print("Measuring weather conditions... ");
-  float temperature = dht.readTemperature();
-  float humidity = dht.readHumidity();
+  float temperature = measureTemperature();
+  float humidity = measureHumidity();
 
   if (!isnan(temperature) && !isnan(humidity)) {
-    String message = String("{\"temp\":") + temperature + ",\"humidity\":" + humidity + "}";
-    Serial.println("Updated!");
-    Serial.print("Reporting to MQTT topic ");
-    Serial.print(MQTT_TOPIC);
-    Serial.print(": ");
-    Serial.println(message);
-    client.publish(MQTT_TOPIC, message.c_str());
+    String requestBody = String("{\"temperature\":") + temperature + ",\"humidity\":" + humidity + "}";
+    Serial.println(requestBody);
+    int httpResponseCode = sendPUTRequest(serverAddress, requestBody.c_str(), authToken);
+
+    if (httpResponseCode == 200) {
+      Serial.println("Actualizado con éxito en el servidor.");
+    } else {
+      Serial.print("Error en la solicitud. Código de respuesta HTTP: ");
+      Serial.println(httpResponseCode);
+    }
   } else {
-    Serial.println("Failed to read data from the DHT sensor.");
+    Serial.println("Error al leer los datos del sensor DHT.");
   }
 
   delay(DELAY);
