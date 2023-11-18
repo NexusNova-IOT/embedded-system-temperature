@@ -10,9 +10,17 @@ void setupWeatherSensor() {
 }
 
 float measureTemperature() {
-  return dht.readTemperature();
+  float temperature = dht.readTemperature();
+  if (isnan(temperature)) {
+    Serial.println("Error reading temperature.");
+  }
+  return temperature;
 }
 
 float measureHumidity() {
-  return dht.readHumidity();
+  float humidity = dht.readHumidity();
+  if (isnan(humidity)) {
+    Serial.println("Error reading humidity.");
+  }
+  return humidity;
 }
