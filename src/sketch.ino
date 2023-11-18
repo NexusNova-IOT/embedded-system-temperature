@@ -21,8 +21,6 @@ void loop() {
     Serial.println(requestBody);
     int httpResponseCode = sendPUTRequest(requestBody.c_str(), authToken.c_str());
     checkResponseCode(httpResponseCode);
-  } else {
-    Serial.println("Error al leer los datos del sensor DHT.");
   }
   delay(DELAY);
 }

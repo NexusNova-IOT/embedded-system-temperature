@@ -3,7 +3,7 @@
 #include <ArduinoJson.h>
 
 const char* authServerAddress = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAYCuRtIMwuPYgezV8R5-QD373Tx4nhJAg";
-const char* serverAddress= "https://lifetravel-iot-backend.azurewebsites.net/api/v1/weather-sensors/update-weather/";
+const char* serverAddress= "https://lifetravel-iot-api.azurewebsites.net/api/v1/weather-sensors/update-weather/";
 
 const char* authAndGetToken(const char* email, const char* password) {
   Serial.println("Inicio de la función authAndGetToken");
@@ -40,10 +40,10 @@ const char* authAndGetToken(const char* email, const char* password) {
 
 int sendPUTRequest(const char* requestBody, const char* authToken, int resourceId) {
   HTTPClient http;
-  http.begin(serverAddress);
+  http.begin(serverAddress + String(resourceId));
   http.addHeader("Content-Type", "application/json");
   String authHeader = "Bearer " + String(authToken);
-  http.addHeader("Authorization", authToken);
+  http.addHeader("Authorization", authHeader);
   
   int httpResponseCode = http.PUT(requestBody);
 
