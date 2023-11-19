@@ -1,4 +1,4 @@
-#include "weather_sensor.h"
+#include "weather_sensor.hpp"
 #include <DHT.h>
 
 const int DHT_PIN = 15;

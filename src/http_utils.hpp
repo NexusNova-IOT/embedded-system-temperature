@@ -1,3 +1,4 @@
+#pragma once
 #ifndef HTTP_UTILS_H
 #define HTTP_UTILS_H
 

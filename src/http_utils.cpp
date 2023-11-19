@@ -1,8 +1,8 @@
-#include "http_utils.h"
+#include "http_utils.hpp"
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
-const char* authServerAddress = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAYCuRtIMwuPYgezV8R5-QD373Tx4nhJAg";
+const char* authServerAddress = "https://lifetravel-iot-api.azurewebsites.net/iot/logger/token";
 const char* serverAddress= "https://lifetravel-iot-api.azurewebsites.net/api/v1/weather-sensors/update-weather/";
 
 const char* authAndGetToken(const char* email, const char* password) {
@@ -12,7 +12,7 @@ const char* authAndGetToken(const char* email, const char* password) {
   http.begin(authServerAddress);
   http.addHeader("Content-Type", "application/json");
 
-  String requestBody = "{\"email\":\"" + String(email) + "\",\"password\":\"" + String(password) + "\",\"returnSecureToken\":true}";
+  String requestBody = "{\"email\":\"" + String(email) + "\",\"password\":\"" + String(password) + "\"}";
 
   int httpResponseCode = http.POST(requestBody);
 
@@ -21,10 +21,9 @@ const char* authAndGetToken(const char* email, const char* password) {
     Serial.println("Server Response:");
     Serial.println(response);
 
-    const size_t capacity = JSON_OBJECT_SIZE(5) + 300;
+    const size_t capacity = JSON_OBJECT_SIZE(10) + 1024;
     DynamicJsonDocument doc(capacity);
     deserializeJson(doc, response);
-
     const char *jwtToken = doc["idToken"];
     http.end();
     Serial.println("End of authAndGetToken function");
