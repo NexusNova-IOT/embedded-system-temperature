@@ -11,7 +11,6 @@ void setup() {
   Serial.begin(115200);
   setupWiFi();
   authToken = authAndGetToken();
-  Serial.println(authToken);
   setupWeatherSensor();
 }
 
