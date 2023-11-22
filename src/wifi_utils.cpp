@@ -5,6 +5,7 @@ const char* ssid = "Wokwi-GUEST";
 const char* password = "";
 
 void setupWiFi() {
+  // Connect to WiFi network
   Serial.print("Connecting to WiFi");
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
