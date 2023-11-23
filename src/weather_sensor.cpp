@@ -1,4 +1,4 @@
-#include "weather_sensor.h"
+#include "weather_sensor.hpp"
 #include <DHT.h>
 
 const int DHT_PIN = 15;
@@ -6,13 +6,24 @@ const int DHT_PIN = 15;
 DHT dht(DHT_PIN, DHT22);
 
 void setupWeatherSensor() {
+    // Initialize the DHT sensor
     dht.begin();
 }
 
 float measureTemperature() {
-  return dht.readTemperature();
+  // Read and return the temperature from the DHT sensor
+  float temperature = dht.readTemperature();
+  if (isnan(temperature)) {
+    Serial.println("Error reading temperature.");
+  }
+  return temperature;
 }
 
 float measureHumidity() {
-  return dht.readHumidity();
+  // Read and return the humidity from the DHT sensor
+  float humidity = dht.readHumidity();
+  if (isnan(humidity)) {
+    Serial.println("Error reading humidity.");
+  }
+  return humidity;
 }

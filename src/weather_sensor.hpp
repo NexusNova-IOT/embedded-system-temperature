@@ -1,5 +1,6 @@
-#ifndef WEATHER_SENSOR_H
-#define WEATHER_SENSOR_H
+#pragma once
+#ifndef WEATHER_SENSOR_HPP
+#define WEATHER_SENSOR_HPP
 
 void setupWeatherSensor();
 float measureTemperature();
